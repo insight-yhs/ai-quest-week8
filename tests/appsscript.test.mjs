@@ -4,8 +4,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-function makeEnv() {
+function makeEnv({ standalone = false } = {}) {
   const sheets = {};
+  const props = {};
+  const created = [];
   const mkSheet = () => {
     const data = [];
     return {
@@ -17,7 +19,16 @@ function makeEnv() {
     };
   };
   const ctx = {
-    SpreadsheetApp: { getActiveSpreadsheet: () => ({ getSheetByName: n => sheets[n], insertSheet: n => (sheets[n] = mkSheet()) }) },
+    SpreadsheetApp: (() => {
+      const book = { getId: () => 'book1', getUrl: () => 'https://sheet', getSheetByName: n => sheets[n], insertSheet: n => (sheets[n] = mkSheet()) };
+      return {
+        getActiveSpreadsheet: () => (standalone ? null : book),
+        create: name => { created.push(name); return book; },
+        openById: id => { assert.equal(id, 'book1'); return book; },
+      };
+    })(),
+    PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] ?? null, setProperty: (k, v) => { props[k] = v; } }) },
+    Logger: { log() {} },
     LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
     ContentService: { MimeType: { JSON: 'json' }, createTextOutput: s => ({ body: s, setMimeType() { return this; } }) },
     Date, JSON, Number, String, Array, Math,
@@ -26,7 +37,7 @@ function makeEnv() {
   vm.runInContext(readFileSync(new URL('../apps-script/Code.gs', import.meta.url), 'utf8'), ctx);
   const post = body => JSON.parse(ctx.doPost({ postData: { contents: JSON.stringify(body) } }).body);
   const get = cls => JSON.parse(ctx.doGet({ parameter: { cls } }).body);
-  return { post, get, sheets };
+  return { post, get, sheets, created, ctx };
 }
 
 test('upsert keeps first score and excludes practice from total', () => {
@@ -51,4 +62,12 @@ test('rejects bad input', () => {
   assert.equal(post({ cls: 'A', nick: 'x', pid: 'p', stage: 1, score: 99999 }).ok, false);
   assert.equal(post({ cls: 'A', nick: '   ', pid: 'p', stage: 1, score: 10 }).ok, false);
   assert.equal(get('A').count, 0);
+});
+
+test('standalone script creates one sheet and reuses it', () => {
+  const { post, get, created, ctx } = makeEnv({ standalone: true });
+  ctx.setup();
+  post({ cls: 'T', nick: '연습', pid: 'p1', stage: 1, score: 700 });
+  assert.equal(get('T').rows[0].total, 700);
+  assert.deepEqual(created, ['AI퀘스트_8주차_점수']);
 });

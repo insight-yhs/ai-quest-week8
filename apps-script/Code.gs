@@ -4,6 +4,8 @@
  * 설치 방법
  * 1. 새 구글 시트를 만든다(이름 예: AI퀘스트_8주차_점수).
  * 2. [확장 프로그램] → [Apps Script]를 열고 이 파일 내용을 모두 붙여 넣은 뒤 저장한다.
+ *    (script.google.com에서 따로 만든 프로젝트여도 된다. 그때는 위쪽 함수 선택에서 setup을 골라
+ *     한 번 [실행]하면 'AI퀘스트_8주차_점수' 시트를 드라이브에 만들고 실행 로그에 주소를 남긴다.)
  * 3. [배포] → [새 배포] → 유형: 웹 앱, 실행 사용자: 나, 액세스 권한: 모든 사용자 → [배포]
  *    (처음에는 권한 승인 창이 뜬다.)
  * 4. 나온 웹 앱 URL(https://script.google.com/macros/s/.../exec)을 게임 담당자에게 전달한다.
@@ -17,8 +19,20 @@ const HEADER = ['pid', 'cls', 'nick', 's0', 's1', 's2', 's3', 's4', 'total', 'at
 const CLASSES = ['A', 'B', 'T'];
 const NICK_MAX = 10;
 
+// 시트에 붙은 스크립트면 그 시트를, 따로 만든 스크립트면 처음 한 번 만든 시트를 쓴다.
+function book_() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('SHEET_ID');
+  if (id) return SpreadsheetApp.openById(id);
+  const ss = SpreadsheetApp.create('AI퀘스트_8주차_점수');
+  props.setProperty('SHEET_ID', ss.getId());
+  return ss;
+}
+
 function sheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = book_();
   let sh = ss.getSheetByName(SHEET);
   if (!sh) {
     sh = ss.insertSheet(SHEET);
@@ -26,6 +40,12 @@ function sheet_() {
     sh.setFrozenRows(1);
   }
   return sh;
+}
+
+// 편집기에서 한 번 실행: 권한 승인 + 점수 시트 준비. 시트 주소는 실행 로그에 나온다.
+function setup() {
+  Logger.log(book_().getUrl());
+  sheet_();
 }
 
 function json_(obj) {

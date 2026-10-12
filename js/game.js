@@ -59,6 +59,9 @@ async function flush() {
         body: JSON.stringify({ cls: S.cls, nick: S.nick, pid: S.pid, stage: item.stage, score: item.score }),
       });
       if (!res.ok) throw new Error(res.status);
+      // 스크립트 오류도 200(HTML)으로 오므로 JSON이 아니면 실패로 보고 다시 보낸다.
+      const data = await res.json();
+      if (!data.ok) console.warn('점수 거절', data.error);
     } catch {
       rest.push(item);
     }
