@@ -1,6 +1,6 @@
 # AI 퀘스트 8주차 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 8주차 수업용 스테이지형 웹 게임(학생용 + 순위판)과 Apps Script 점수 서버, 진행 슬라이드를 만든다.
 
@@ -36,7 +36,7 @@
 - `mergeScore(row: Row|null, {cls, nick, pid, stage, score, at}): Row` — `Row = {pid, cls, nick, stages: {[stage]: number}, total: number, at: number}`; 이미 있는 stage 점수는 유지, `at`은 마지막 반영 시각
 - `rankPlayers(rows: Row[], limit=10): Row[]` — total 내림차순, 동점 at 오름차순
 
-- [ ] **Step 1: 실패하는 테스트 작성**
+- [x] **Step 1: 실패하는 테스트 작성**
 
 ```js
 import test from 'node:test'; import assert from 'node:assert/strict';
@@ -59,10 +59,10 @@ test('rank', () => {
 });
 ```
 
-- [ ] **Step 2:** `npm test` → FAIL (모듈 없음)
-- [ ] **Step 3:** `js/logic.js` 구현 (위 인터페이스 그대로)
-- [ ] **Step 4:** `npm test` → PASS
-- [ ] **Step 5:** commit `feat: 채점·판정 로직과 테스트`
+- [x] **Step 2:** `npm test` → FAIL (모듈 없음)
+- [x] **Step 3:** `js/logic.js` 구현 (위 인터페이스 그대로)
+- [x] **Step 4:** `npm test` → PASS
+- [x] **Step 5:** commit `feat: 채점·판정 로직과 테스트`
 
 ### Task 2: 문제 데이터 (`js/content.js`)
 
@@ -76,11 +76,11 @@ export const STAGES = [ { id: 0|1|2|3|4, title, subtitle, code: string|null, que
 ```
 스펙 4절 문항을 그대로 옮긴다(연습 1, 1스테이지 10, 2스테이지 순서 1 + 선택 3, 3스테이지 7, 4스테이지 5).
 
-- [ ] **Step 1:** 무결성 테스트 추가: 모든 choice의 `answer`가 options 범위 안, `probs` 있으면 길이 같고 최댓값 인덱스 = answer, 스테이지 1~4는 code가 있고 0은 null, 코드 중복 없음.
-- [ ] **Step 2:** `npm test` → FAIL
-- [ ] **Step 3:** `js/content.js` 작성
-- [ ] **Step 4:** `npm test` → PASS
-- [ ] **Step 5:** commit `feat: 8주차 문제 데이터`
+- [x] **Step 1:** 무결성 테스트 추가: 모든 choice의 `answer`가 options 범위 안, `probs` 있으면 길이 같고 최댓값 인덱스 = answer, 스테이지 1~4는 code가 있고 0은 null, 코드 중복 없음.
+- [x] **Step 2:** `npm test` → FAIL
+- [x] **Step 3:** `js/content.js` 작성
+- [x] **Step 4:** `npm test` → PASS
+- [x] **Step 5:** commit `feat: 8주차 문제 데이터`
 
 ### Task 3: 학생용 게임 화면 (`index.html`, `css/style.css`, `js/game.js`, `js/config.js`)
 
@@ -90,9 +90,9 @@ export const STAGES = [ { id: 0|1|2|3|4, title, subtitle, code: string|null, que
 순서 문제: 카드를 차례로 눌러 1~5번 칸에 놓고 [확인], 칸 다시 누르면 빼기.
 상태 `aiq8`(localStorage): `{pid, cls, nick, unlocked:number[], scores:{}, pending:[]}`. 점수 전송은 `fetch(API_URL, {method:'POST', body: JSON.stringify(...)})`(Content-Type 미지정 = text/plain), 실패하면 pending에 남겨 다음 완료 때 재전송.
 
-- [ ] **Step 1:** 파일 작성
-- [ ] **Step 2:** `python3 -m http.server`로 띄워 Chrome에서 연습→1~4 끝까지 플레이, 390px 폭 확인, 새로고침 후 상태 유지 확인
-- [ ] **Step 3:** commit `feat: 학생용 게임 화면`
+- [x] **Step 1:** 파일 작성
+- [x] **Step 2:** `python3 -m http.server`로 띄워 Chrome에서 연습→1~4 끝까지 플레이, 390px 폭 확인, 새로고침 후 상태 유지 확인
+- [x] **Step 3:** commit `feat: 학생용 게임 화면`
 
 ### Task 4: 점수 서버와 순위판 (`apps-script/Code.gs`, `board.html`, `js/board.js`)
 
@@ -101,13 +101,13 @@ export const STAGES = [ { id: 0|1|2|3|4, title, subtitle, code: string|null, que
 - `doGet(e)`: `?cls=A` → 해당 반 행 → `{rows:[{nick,total,stages,at}], count, done:[s1완료수..s4]}`
 - board.js: `?class=A`, 5초마다 `fetch(API_URL+'?cls=A')`, 상위 10명 + 참여 인원 + 스테이지 완료 인원, 실패 시 "연결 대기 중"
 
-- [ ] **Step 1:** 파일 작성. Code.gs 상단에 배포 방법 주석.
-- [ ] **Step 2:** API_URL 없이 board.html이 "연결 대기 중"을 보이는지 확인. 가짜 응답(로컬 `mock.json`, `?mock=1`)으로 표 렌더링 확인.
-- [ ] **Step 3:** commit `feat: 점수 서버와 순위판`
+- [x] **Step 1:** 파일 작성. Code.gs 상단에 배포 방법 주석.
+- [x] **Step 2:** API_URL 없이 board.html이 "연결 대기 중"을 보이는지 확인. 가짜 응답(로컬 `mock.json`, `?mock=1`)으로 표 렌더링 확인.
+- [x] **Step 3:** commit `feat: 점수 서버와 순위판`
 
 ### Task 5: 배포
 
-- [ ] `gh repo create insight-yhs/ai-quest-week8 --public` (insight-yhs 계정으로 전환 후), push, Pages 활성화(main / root), 주소 응답 확인, 계정 원래대로 전환.
+- [x] `gh repo create insight-yhs/ai-quest-week8 --public` (insight-yhs 계정으로 전환 후), push, Pages 활성화(main / root), 주소 응답 확인, 계정 원래대로 전환.
 
 ### Task 6: 8주차 슬라이드
 
