@@ -49,25 +49,37 @@ function renderWho() {
 }
 
 // ---------- 점수 전송 ----------
-async function flush() {
-  if (!API_URL || !S?.pending?.length) return;
-  const rest = [];
-  for (const item of S.pending) {
+// 한 번에 하나씩 보낸다. 보내는 동안 새로 쌓인 점수도 같은 차례에 이어서 보내고,
+// 성공한 것만 대기열에서 뺀다(보내는 중에 생긴 점수를 덮어써 잃지 않도록).
+const RETRY_MS = 15000;
+let flushing = null;
+function flush() {
+  if (!flushing) flushing = sendPending().finally(() => { flushing = null; });
+  return flushing;
+}
+
+async function sendPending() {
+  const me = S;
+  if (!API_URL || !me?.pending?.length) return;
+  const tried = new Set();
+  let item;
+  while ((item = me.pending.find(p => !tried.has(p)))) {
+    tried.add(item);
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
-        body: JSON.stringify({ cls: S.cls, nick: S.nick, pid: S.pid, stage: item.stage, score: item.score }),
+        body: JSON.stringify({ cls: me.cls, nick: me.nick, pid: me.pid, stage: item.stage, score: item.score }),
       });
       if (!res.ok) throw new Error(res.status);
       // 스크립트 오류도 200(HTML)으로 오므로 JSON이 아니면 실패로 보고 다시 보낸다.
       const data = await res.json();
       if (!data.ok) console.warn('점수 거절', data.error);
+      me.pending = me.pending.filter(p => p !== item);
+      if (me === S) save();
     } catch {
-      rest.push(item);
+      // 남겨 두었다가 15초마다 다시 보낸다(아래 RETRY_MS).
     }
   }
-  S.pending = rest;
-  save();
 }
 
 // ---------- 화면 ----------
@@ -283,7 +295,7 @@ function stageEnd() {
       <div class="big">${view.score}점</div>
       <p>${n}문제 중 ${view.correct}문제를 맞혔어요.</p>
       ${st.id === 0 ? '<p class="muted">연습 점수는 순위에 들어가지 않아요. 이제 교수님 설명을 듣고 열쇠 코드를 기다리세요.</p>' : ''}
-      ${waiting ? '<p class="note">점수를 보내는 중이에요. 인터넷이 연결되면 다음 스테이지를 마칠 때 다시 보냅니다.</p>' : ''}
+      ${waiting ? '<p class="note">점수를 보내는 중이에요. 보내지 못하면 잠시 뒤 자동으로 다시 보냅니다.</p>' : ''}
       <div class="actions"><button class="btn full" id="back">${allDone() ? '최종 결과 보기' : '스테이지 지도로'}</button></div>
     </div>`;
   document.getElementById('back').onclick = () => render(allDone() ? 'final' : 'map');
@@ -318,3 +330,7 @@ if (!S) render('join');
 else if (S.run) render('question');
 else render('map');
 flush();
+// 마지막 스테이지 점수가 실패해도 화면을 켜 둔 동안 계속 다시 보낸다.
+setInterval(() => {
+  if (S?.pending?.length) flush().then(() => { if (view?.name === 'stageEnd') render('stageEnd', view); });
+}, RETRY_MS);
