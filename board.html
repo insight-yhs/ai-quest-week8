@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 퀘스트 순위판</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/board.css">
+</head>
+<body class="board">
+<header class="bhead">
+  <div>
+    <div class="kicker" style="color:var(--yellow)">컴퓨터의 이해와 활용 · 8주차</div>
+    <h1>AI 퀘스트 순위판 <span id="cls"></span></h1>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</header>
+<main class="bmain">
+  <section class="rank" id="rank" aria-live="polite"></section>
+  <aside class="side">
+    <div class="stat"><div class="label">참여 인원</div><div class="value" id="count">-</div></div>
+    <div class="stat"><div class="label">스테이지 완료</div><div id="done"></div></div>
+    <p class="status" id="status"></p>
+  </aside>
+</main>
+<script type="module" src="js/board.js"></script>
+</body>
+</html>

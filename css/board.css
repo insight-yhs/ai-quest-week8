@@ -1,0 +1,30 @@
+body.board { color: var(--white); }
+.bhead { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; padding: 28px 24px 12px; }
+.bhead h1 { font-size: 40px; margin: 0; }
+.bhead h1 span { color: var(--yellow); }
+.tabs { display: flex; gap: 8px; }
+.tabs a { color: #dce7f2; text-decoration: none; border: 1px solid #5d7189; border-radius: 999px; padding: 6px 14px; font-weight: 700; }
+.tabs a[aria-current="page"] { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+.bmain { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1200px; margin: 0 auto; padding: 12px 24px 40px; }
+.rank { display: grid; gap: 8px; align-content: start; }
+.rank .item { display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 14px; background: var(--navy-2); border-radius: 14px; padding: 8px 20px; }
+.rank .item.podium { background: var(--white); color: var(--ink); }
+.rank .pos { font-size: 28px; font-weight: 900; text-align: center; }
+.rank .nick { font-size: 26px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank .pts { font-size: 28px; font-weight: 900; color: var(--yellow); }
+.rank .item.podium .pts { color: var(--blue); }
+.rank .empty { background: var(--navy-2); border-radius: 16px; padding: 40px; text-align: center; font-size: 22px; color: #c5d2e0; }
+.side { display: grid; gap: 14px; align-content: start; }
+.stat { background: var(--navy-2); border-radius: 16px; padding: 18px 20px; }
+.stat .label { color: #c5d2e0; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.stat .value { font-size: 44px; font-weight: 900; }
+.dl { display: grid; grid-template-columns: 70px 1fr 36px; align-items: center; gap: 8px; margin-top: 10px; font-size: 15px; }
+.dl .track { height: 10px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; }
+.dl .track span { display: block; height: 100%; background: var(--yellow); }
+.dl b { text-align: right; }
+.status { color: #c5d2e0; font-size: 14px; margin: 0; }
+@media (max-width: 800px) {
+  .bmain { grid-template-columns: 1fr; }
+  .bhead h1 { font-size: 30px; }
+  .rank .nick, .rank .pts { font-size: 21px; }
+}
